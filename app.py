@@ -12,8 +12,8 @@ import datetime
 from rdkit import Chem
 from rdkit.Chem import AllChem, MACCSkeys
 from rdkit.Chem.Scaffolds import MurckoScaffold
-import matplotlib.pyplot as plt
-import seaborn as sns
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 
 # ============================================================
 # PAGE CONFIG
@@ -290,17 +290,24 @@ def run_screening(df, smiles_col, models):
 # PLOTS
 # ============================================================
 
+# def plot_probability(df):
+#     fig,ax = plt.subplots()
+#     sns.histplot(df["Consensus_Probability"],kde=True,ax=ax)
+#     st.pyplot(fig)
+
+# def plot_heatmap(df):
+#     prob_cols = [c for c in df.columns if c.endswith("_Prob")]
+#     fig,ax = plt.subplots(figsize=(8,5))
+#     sns.heatmap(df[prob_cols].head(30),cmap="viridis",ax=ax)
+#     st.pyplot(fig)
 def plot_probability(df):
-    fig,ax = plt.subplots()
-    sns.histplot(df["Consensus_Probability"],kde=True,ax=ax)
-    st.pyplot(fig)
+    st.subheader("Consensus Probability Distribution")
+    st.bar_chart(df["Consensus_Probability"])
 
 def plot_heatmap(df):
+    st.subheader("Model Probability Comparison")
     prob_cols = [c for c in df.columns if c.endswith("_Prob")]
-    fig,ax = plt.subplots(figsize=(8,5))
-    sns.heatmap(df[prob_cols].head(30),cmap="viridis",ax=ax)
-    st.pyplot(fig)
-
+    st.dataframe(df[prob_cols].head(30))
 # ============================================================
 # SINGLE SMILES
 # ============================================================
@@ -481,4 +488,5 @@ st.info(
     "**CaGS-AP** is an AI-driven platform for predicting inhibitors of "
     "*Candida albicans* **β-1,3-glucan synthase**, supporting antifungal drug discovery."
 )
+
 
