@@ -10,7 +10,7 @@ import joblib
 import os
 import datetime
 from rdkit import Chem
-from rdkit.Chem import AllChem, MACCSkeys, Draw
+from rdkit.Chem import AllChem, MACCSkeys
 from rdkit.Chem.Scaffolds import MurckoScaffold
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -312,7 +312,7 @@ def single_smiles_predict(smiles, models):
         st.error("Invalid SMILES")
         return
 
-    st.image(Draw.MolToImage(mol,size=(300,300)))
+    # st.image(Draw.MolToImage(mol,size=(300,300)))
 
     fp = fingerprints_from_smiles(smiles)
     X = pd.DataFrame([fp])
@@ -481,3 +481,4 @@ st.info(
     "**CaGS-AP** is an AI-driven platform for predicting inhibitors of "
     "*Candida albicans* **β-1,3-glucan synthase**, supporting antifungal drug discovery."
 )
+
