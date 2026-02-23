@@ -10,7 +10,7 @@ import joblib
 import os
 import datetime
 from rdkit import Chem
-from rdkit.Chem import AllChem, MACCSkeys
+# from rdkit.Chem import AllChem, MACCSkeys
 from rdkit.Chem.Scaffolds import MurckoScaffold
 # import matplotlib.pyplot as plt
 # import seaborn as sns
@@ -488,5 +488,6 @@ st.info(
     "**CaGS-AP** is an AI-driven platform for predicting inhibitors of "
     "*Candida albicans* **β-1,3-glucan synthase**, supporting antifungal drug discovery."
 )
+
 
 
