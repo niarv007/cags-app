@@ -283,10 +283,12 @@ def run_screening(df, smiles_col, models):
 
     prog.empty()
 
-    final = pd.concat(results_all)
     if not results_all:
-    st.warning("No valid molecules found.")
-    return pd.DataFrame()
+        st.warning("No valid molecules found.")
+        return pd.DataFrame()
+
+    final = pd.concat(results_all)
+    return final.sort_values("Consensus_Probability", ascending=False)
 
 # final = pd.concat(results_all)
 #     return final.sort_values("Consensus_Probability",ascending=False)
@@ -497,6 +499,7 @@ st.info(
     "**CaGS-AP** is an AI-driven platform for predicting inhibitors of "
     "*Candida albicans* **β-1,3-glucan synthase**, supporting antifungal drug discovery."
 )
+
 
 
 
