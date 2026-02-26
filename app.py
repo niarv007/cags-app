@@ -202,7 +202,58 @@ def run_screening(df, smiles_col, models):
 
     final = pd.concat(results_all)
     return final.sort_values("Consensus_Probability", ascending=False)
+# ============================================================
+# VISUALIZATIONS
+# ============================================================
 
+# 1️⃣ Probability Distribution
+st.subheader("Probability Distribution")
+
+fig1, ax1 = plt.subplots(figsize=(6,4))
+ax1.hist(results["Consensus_Probability"], bins=20)
+ax1.set_xlabel("Consensus Probability")
+ax1.set_ylabel("Frequency")
+ax1.set_title("Distribution of Predicted Activity Probabilities")
+st.pyplot(fig1)
+
+
+# 2️⃣ Model Vote Analysis
+st.subheader("Model Vote Analysis")
+
+vote_counts = results["Model_Vote"].value_counts()
+
+fig2, ax2 = plt.subplots(figsize=(6,4))
+vote_counts.plot(kind="bar", ax=ax2)
+ax2.set_xlabel("Model Vote")
+ax2.set_ylabel("Count")
+ax2.set_title("Model Voting Distribution")
+st.pyplot(fig2)
+
+
+# 3️⃣ Confidence Distribution
+st.subheader("Confidence Distribution")
+
+conf_counts = results["Confidence"].value_counts()
+
+fig3, ax3 = plt.subplots(figsize=(6,4))
+conf_counts.plot(kind="bar", ax=ax3)
+ax3.set_xlabel("Confidence Level")
+ax3.set_ylabel("Count")
+ax3.set_title("Prediction Confidence Distribution")
+st.pyplot(fig3)
+
+
+# 4️⃣ Scaffold SAR
+st.subheader("Top Scaffolds")
+
+top_scaffolds = results["Scaffold"].value_counts().head(10)
+
+fig4, ax4 = plt.subplots(figsize=(8,5))
+top_scaffolds.plot(kind="barh", ax=ax4)
+ax4.set_xlabel("Frequency")
+ax4.set_ylabel("Scaffold")
+ax4.set_title("Top 10 Murcko Scaffolds")
+st.pyplot(fig4)
 # ============================================================
 # APP LOGIC
 # ============================================================
@@ -285,6 +336,7 @@ else:
             st.write(f"Std Dev: {sd_prob:.4f}")
 
             st.table(pd.DataFrame(prob_dict,index=["Probability"]).T)
+
 
 
 
