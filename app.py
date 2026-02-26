@@ -1,5 +1,5 @@
 # ============================================================
-# CaGS-AP FINAL CLEAN PRODUCTION VERSION
+# CaGS-AP FINAL CLEAN PRODUCTION VERSION (VISUAL FIXED)
 # ============================================================
 
 import streamlit as st
@@ -12,18 +12,14 @@ import warnings
 from rdkit import Chem
 from rdkit.Chem import MACCSkeys
 from rdkit.Chem.Scaffolds import MurckoScaffold
+from rdkit.Chem import rdFingerprintGenerator
+from rdkit import DataStructs
 
-# ---- Suppress sklearn feature warnings ----
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# ---- Safe Matplotlib Backend ----
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-
-# ---- PDF Report ----
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table
-from reportlab.lib.styles import getSampleStyleSheet
 
 # ============================================================
 # PAGE CONFIG
@@ -69,20 +65,10 @@ def load_model(name):
     return joblib.load(os.path.join(MODEL_DIR,name))
 
 # ============================================================
-# FINGERPRINTS (CLOUD SAFE – RDKit 2025 Compatible)
+# FINGERPRINTS
 # ============================================================
 
-from rdkit.Chem import rdFingerprintGenerator
-from rdkit import DataStructs
-
-# Standard Morgan (ECFP-like)
-morgan_gen_ecfp = rdFingerprintGenerator.GetMorganGenerator(
-    radius=2,
-    fpSize=1024
-)
-
-# FCFP (Feature Morgan)
-# In new RDKit, feature fingerprints require FeatureGenerator
+morgan_gen_ecfp = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=1024)
 morgan_gen_fcfp = rdFingerprintGenerator.GetMorganGenerator(
     radius=2,
     fpSize=1024,
@@ -107,11 +93,10 @@ def fingerprints_from_smiles(smiles):
     DataStructs.ConvertToNumpyArray(maccs, maccs_arr)
 
     return np.concatenate([ecfp_arr, fcfp_arr, maccs_arr])
-# ============================================================
-# SCAFFOLD GENERATION
-# ============================================================
 
-from rdkit.Chem.Scaffolds import MurckoScaffold
+# ============================================================
+# SCAFFOLD
+# ============================================================
 
 def get_scaffold(smiles):
     try:
@@ -122,6 +107,7 @@ def get_scaffold(smiles):
         return Chem.MolToSmiles(scaffold)
     except:
         return None
+
 # ============================================================
 # CONSENSUS METRICS
 # ============================================================
@@ -202,58 +188,7 @@ def run_screening(df, smiles_col, models):
 
     final = pd.concat(results_all)
     return final.sort_values("Consensus_Probability", ascending=False)
-# ============================================================
-# VISUALIZATIONS
-# ============================================================
 
-# 1️⃣ Probability Distribution
-st.subheader("Probability Distribution")
-
-fig1, ax1 = plt.subplots(figsize=(6,4))
-ax1.hist(results["Consensus_Probability"], bins=20)
-ax1.set_xlabel("Consensus Probability")
-ax1.set_ylabel("Frequency")
-ax1.set_title("Distribution of Predicted Activity Probabilities")
-st.pyplot(fig1)
-
-
-# 2️⃣ Model Vote Analysis
-st.subheader("Model Vote Analysis")
-
-vote_counts = results["Model_Vote"].value_counts()
-
-fig2, ax2 = plt.subplots(figsize=(6,4))
-vote_counts.plot(kind="bar", ax=ax2)
-ax2.set_xlabel("Model Vote")
-ax2.set_ylabel("Count")
-ax2.set_title("Model Voting Distribution")
-st.pyplot(fig2)
-
-
-# 3️⃣ Confidence Distribution
-st.subheader("Confidence Distribution")
-
-conf_counts = results["Confidence"].value_counts()
-
-fig3, ax3 = plt.subplots(figsize=(6,4))
-conf_counts.plot(kind="bar", ax=ax3)
-ax3.set_xlabel("Confidence Level")
-ax3.set_ylabel("Count")
-ax3.set_title("Prediction Confidence Distribution")
-st.pyplot(fig3)
-
-
-# 4️⃣ Scaffold SAR
-st.subheader("Top Scaffolds")
-
-top_scaffolds = results["Scaffold"].value_counts().head(10)
-
-fig4, ax4 = plt.subplots(figsize=(8,5))
-top_scaffolds.plot(kind="barh", ax=ax4)
-ax4.set_xlabel("Frequency")
-ax4.set_ylabel("Scaffold")
-ax4.set_title("Top 10 Murcko Scaffolds")
-st.pyplot(fig4)
 # ============================================================
 # APP LOGIC
 # ============================================================
@@ -296,6 +231,33 @@ if mode == "Upload CSV":
                 st.subheader("Screening Results")
                 st.dataframe(results)
 
+                # ================= VISUALIZATIONS =================
+
+                st.subheader("Probability Distribution")
+                fig1, ax1 = plt.subplots(figsize=(6,4))
+                ax1.hist(results["Consensus_Probability"], bins=20)
+                ax1.set_xlabel("Consensus Probability")
+                ax1.set_ylabel("Frequency")
+                st.pyplot(fig1)
+
+                st.subheader("Model Vote Analysis")
+                vote_counts = results["Model_Vote"].value_counts()
+                fig2, ax2 = plt.subplots(figsize=(6,4))
+                vote_counts.plot(kind="bar", ax=ax2)
+                st.pyplot(fig2)
+
+                st.subheader("Confidence Distribution")
+                conf_counts = results["Confidence"].value_counts()
+                fig3, ax3 = plt.subplots(figsize=(6,4))
+                conf_counts.plot(kind="bar", ax=ax3)
+                st.pyplot(fig3)
+
+                st.subheader("Top Scaffolds")
+                top_scaffolds = results["Scaffold"].value_counts().head(10)
+                fig4, ax4 = plt.subplots(figsize=(8,5))
+                top_scaffolds.plot(kind="barh", ax=ax4)
+                st.pyplot(fig4)
+
                 st.download_button("Download Results",
                                    results.to_csv(index=False),
                                    "CaGS_AP_results.csv")
@@ -336,8 +298,3 @@ else:
             st.write(f"Std Dev: {sd_prob:.4f}")
 
             st.table(pd.DataFrame(prob_dict,index=["Probability"]).T)
-
-
-
-
-
